@@ -33,6 +33,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 html,
@@ -40,6 +41,7 @@ body {
   width: 100%;
   min-height: 100%;
   margin: 0;
+  overflow-x: hidden;
   color: var(--text-primary);
   background: var(--bg-dark);
   font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -58,6 +60,62 @@ button {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+img,
+video,
+canvas {
+  height: auto;
+}
+
+svg {
+  flex-shrink: 0;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  min-width: 0;
+}
+
+/* Responsive homepage layout helpers */
+.home-expertise-grid,
+.testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.featured-grid,
+.why-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: center;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.featured-stack,
+.why-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.why-list {
+  gap: 1rem;
 }
 
 /* ═══════════════════════════════════════════
@@ -2223,11 +2281,22 @@ a {
   .about-story {
     gap: 2rem;
   }
+
+  .home-expertise-grid,
+  .testimonial-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .featured-grid,
+  .why-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 920px) {
   .site-header {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 0.75rem;
   }
 
   .site-nav {
@@ -2290,7 +2359,7 @@ a {
   }
 
   .sc-card {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 3 / 4;
   }
 
   .process-grid {
@@ -2329,7 +2398,8 @@ a {
   }
 
   .stats-strip {
-    padding: 2rem;
+    justify-content: center !important;
+    padding: 2rem !important;
   }
 
   .page-hero {
@@ -2342,6 +2412,7 @@ a {
     right: 0.75rem;
     left: 0.75rem;
     padding: 0.75rem;
+    min-height: 3.8rem;
   }
 
   .site-brand strong {
@@ -2353,6 +2424,7 @@ a {
   }
 
   .header-cta {
+    display: none;
     min-height: 2.4rem;
     padding: 0 0.75rem;
     font-size: 0.75rem;
@@ -2367,15 +2439,27 @@ a {
   }
 
   .hero-section {
-    min-height: 125vh;
+    min-height: 100svh;
+  }
+
+  .hero-video {
+    width: 100vw;
+    height: 68svh;
+    object-position: center top;
   }
 
   .hero-copy {
-    bottom: 5rem;
+    right: 1rem;
+    bottom: max(2rem, env(safe-area-inset-bottom));
   }
 
   .hero-copy h1 {
-    font-size: clamp(2.65rem, 14vw, 4.1rem);
+    font-size: clamp(2.25rem, 13vw, 3.6rem);
+  }
+
+  .hero-copy p:not(.hero-kicker) {
+    font-size: 0.95rem;
+    line-height: 1.55;
   }
 
   .hero-actions,
@@ -2393,12 +2477,69 @@ a {
   .sc-cards,
   .process-grid,
   .footer-grid,
-  .team-grid {
+  .team-grid,
+  .home-expertise-grid,
+  .testimonial-grid {
     grid-template-columns: 1fr;
   }
 
   .sc-card {
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 3 / 4;
+  }
+
+  .sc-section {
+    padding: 4rem 1rem;
+    min-height: auto;
+  }
+
+  .sc-header {
+    margin-bottom: 2rem;
+  }
+
+  .sc-header__title {
+    font-size: clamp(2rem, 12vw, 3.2rem);
+  }
+
+  .sc-header__subtitle {
+    font-size: 0.95rem;
+  }
+
+  .sc-card {
+    transform: none !important;
+    opacity: 1 !important;
+    will-change: auto;
+  }
+
+  .sc-card__overlay {
+    padding: 1.25rem;
+    opacity: 1;
+  }
+
+  .sc-card__tag,
+  .sc-card__title,
+  .sc-card__desc {
+    transform: none;
+    opacity: 1;
+  }
+
+  .sc-card__title {
+    font-size: 1.05rem;
+  }
+
+  .sc-scroll-indicator,
+  .sc-particles,
+  .sc-grid-lines {
+    display: none;
+  }
+
+  .featured-grid,
+  .why-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .featured-stack,
+  .why-list {
+    gap: 1rem;
   }
 
   .featured-card--big {
@@ -2417,6 +2558,10 @@ a {
     grid-template-columns: 1fr;
   }
 
+  .contact-form {
+    padding: 1.25rem;
+  }
+
   .page-hero {
     padding: 8rem 1rem 2.5rem;
   }
@@ -2424,7 +2569,7 @@ a {
   .stats-strip {
     flex-direction: column;
     gap: 1.5rem;
-    padding: 2rem 1rem;
+    padding: 2rem 1rem !important;
   }
 
   .footer-bottom {

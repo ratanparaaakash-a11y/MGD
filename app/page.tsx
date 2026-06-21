@@ -77,6 +77,7 @@ export default function Home() {
       {/* ─── STATS / NUMBERS STRIP ─── */}
       <ParallaxSection
         id="stats"
+        className="stats-strip"
         speed={0.08}
         slideDistance={40}
         style={{
@@ -164,15 +165,7 @@ export default function Home() {
             OUR CORE EXPERTISE
           </h2>
         </ParallaxLayer>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "1.5rem",
-            maxWidth: "1180px",
-            margin: "0 auto",
-          }}
-        >
+        <div className="home-expertise-grid">
           {[
             {
               icon: (
@@ -260,15 +253,7 @@ export default function Home() {
             FEATURED WORK
           </h2>
         </ParallaxLayer>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1.2fr 1fr",
-            gap: "1.5rem",
-            maxWidth: "1180px",
-            margin: "0 auto",
-          }}
-        >
+        <div className="featured-grid">
           {/* Big card */}
           <ParallaxLayer speed={0.06}>
             <div className="featured-card featured-card--big">
@@ -281,7 +266,7 @@ export default function Home() {
             </div>
           </ParallaxLayer>
           {/* Two small cards stacked */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+          <div className="featured-stack">
             {[
               {
                 title: "Industrial VR Trainer",
@@ -325,16 +310,7 @@ export default function Home() {
           background: "var(--surface)",
         }}
       >
-        <div
-          style={{
-            maxWidth: "1180px",
-            margin: "0 auto",
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "4rem",
-            alignItems: "center",
-          }}
-        >
+        <div className="why-grid">
           <ParallaxLayer speed={0.08}>
             <p
               style={{
@@ -375,7 +351,7 @@ export default function Home() {
               About Us →
             </Link>
           </ParallaxLayer>
-          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div className="why-list">
             {[
               { title: "Full Pipeline Studio", desc: "Blender 3D art + Unity dev under one roof." },
               { title: "Multi-Platform Delivery", desc: "Web, mobile, desktop, and headset builds." },
@@ -430,15 +406,7 @@ export default function Home() {
             WHAT CLIENTS SAY
           </h2>
         </ParallaxLayer>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "1.5rem",
-            maxWidth: "1180px",
-            margin: "0 auto",
-          }}
-        >
+        <div className="testimonial-grid">
           {[
             {
               quote: "Mukta transformed our concept into a stunning 3D experience. The attention to detail was extraordinary.",
