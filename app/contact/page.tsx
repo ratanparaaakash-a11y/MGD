@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { Footer } from "@/components/Footer";
 
 export default function ContactPage() {
   const [form, setForm] = useState({
@@ -345,6 +346,8 @@ export default function ContactPage() {
           BOOK A CALL →
         </Link>
       </section>
+
+      <Footer />
     </>
   );
 }

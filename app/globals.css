@@ -373,10 +373,12 @@ textarea {
 }
 
 .hero-video {
-  width: min(82vw, 1320px);
-  height: min(82vh, 760px);
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
   display: block;
-  object-fit: contain;
+  object-fit: initial;
   object-position: center;
   pointer-events: none;
   filter: brightness(1.02) contrast(1.04) saturate(1);
@@ -2336,11 +2338,6 @@ textarea {
     min-height: 112vh;
   }
 
-  .hero-video {
-    width: 92vw;
-    height: 86vh;
-  }
-
   .hero-copy {
     top: auto;
     bottom: 7rem;
@@ -2440,12 +2437,6 @@ textarea {
 
   .hero-section {
     min-height: 100svh;
-  }
-
-  .hero-video {
-    width: 100vw;
-    height: 68svh;
-    object-position: center top;
   }
 
   .hero-copy {

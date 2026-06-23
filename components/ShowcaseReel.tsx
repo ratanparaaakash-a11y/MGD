@@ -247,21 +247,37 @@ export function ShowcaseReel() {
     const el = sectionRef.current;
     if (!el) return;
 
+    let rafId: number;
+    let isIntersecting = false;
+
     const onScroll = () => {
+      if (!isIntersecting) return;
       const rect = el.getBoundingClientRect();
       const windowH = window.innerHeight;
       const raw = (windowH - rect.top) / (windowH + rect.height);
       const clamped = Math.max(0, Math.min(1, raw));
       setProgress(clamped);
       setIsVisible(clamped > 0.05);
+      rafId = requestAnimationFrame(onScroll);
     };
 
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isIntersecting = entry.isIntersecting;
+        if (isIntersecting) {
+          rafId = requestAnimationFrame(onScroll);
+        } else {
+          cancelAnimationFrame(rafId);
+        }
+      },
+      { threshold: 0, rootMargin: "200px 0px 200px 0px" }
+    );
+
+    observer.observe(el);
+
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      observer.disconnect();
+      cancelAnimationFrame(rafId);
     };
   }, []);
 

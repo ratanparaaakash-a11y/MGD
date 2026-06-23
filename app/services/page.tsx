@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Footer } from "@/components/Footer";
 
 /* ─── Inline SVG Icons (24×24, stroke, currentColor) ─── */
 
@@ -277,6 +278,8 @@ export default function ServicesPage() {
           </Link>
         </div>
       </section>
+
+      <Footer />
     </>
   );
 }
