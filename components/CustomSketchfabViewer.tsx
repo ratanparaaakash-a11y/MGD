@@ -8,8 +8,7 @@ export function CustomSketchfabViewer() {
 
   const isDragging = useRef(false);
   const lastMousePos = useRef({ x: 0, y: 0 });
-  const isHovering = useRef(false);
-  
+
   // Camera state
   const camState = useRef({
     distance: 10,
@@ -20,7 +19,7 @@ export function CustomSketchfabViewer() {
 
   useEffect(() => {
     if (!iframeRef.current) return;
-    
+
     // Dynamically require Sketchfab Viewer API to avoid SSR 'self is not defined' error
     const Sketchfab = require("@sketchfab/viewer-api");
     const client = new Sketchfab(iframeRef.current);
@@ -42,17 +41,17 @@ export function CustomSketchfabViewer() {
         sketchfabApi.start();
         sketchfabApi.addEventListener("viewerready", () => {
           setApi(sketchfabApi);
-          
+
           sketchfabApi.getCameraLookAt((err: any, camera: any) => {
             if (!err && camera) {
               const dx = camera.position[0] - camera.target[0];
               const dy = camera.position[1] - camera.target[1];
               const dz = camera.position[2] - camera.target[2];
-              
-              const distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
+
+              const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
               const azimuth = Math.atan2(dy, dx);
               const polar = Math.acos(dz / distance);
-              
+
               camState.current = {
                 distance,
                 azimuth,
@@ -70,11 +69,11 @@ export function CustomSketchfabViewer() {
   const updateCamera = (duration = 0) => {
     if (!api) return;
     const { distance, azimuth, polar, target } = camState.current;
-    
+
     const x = target[0] + distance * Math.sin(polar) * Math.cos(azimuth);
     const y = target[1] + distance * Math.sin(polar) * Math.sin(azimuth);
     const z = target[2] + distance * Math.cos(polar);
-    
+
     api.setCameraLookAt([x, y, z], target, duration);
   };
 
@@ -82,10 +81,33 @@ export function CustomSketchfabViewer() {
     const container = containerRef.current;
     if (!container || !api) return;
 
+    const fetchCamera = () => {
+      api.getCameraLookAt((err: any, camera: any) => {
+        if (!err && camera) {
+          const dx = camera.position[0] - camera.target[0];
+          const dy = camera.position[1] - camera.target[1];
+          const dz = camera.position[2] - camera.target[2];
+          
+          const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+          const azimuth = Math.atan2(dy, dx);
+          const polar = Math.acos(dz / distance);
+          
+          camState.current = {
+            distance,
+            azimuth,
+            polar,
+            target: camera.target
+          };
+        }
+      });
+    };
+
     const onPointerDown = (e: PointerEvent) => {
       isDragging.current = true;
       lastMousePos.current = { x: e.clientX, y: e.clientY };
       container.setPointerCapture(e.pointerId);
+      // Fetch camera just in case, though pointerenter should have caught it
+      fetchCamera();
     };
 
     const onPointerMove = (e: PointerEvent) => {
@@ -97,45 +119,16 @@ export function CustomSketchfabViewer() {
 
         camState.current.azimuth -= dx * 0.01;
         camState.current.polar -= dy * 0.01;
-        
+
         // Clamp polar angle to avoid flipping
         camState.current.polar = Math.max(0.1, Math.min(Math.PI - 0.1, camState.current.polar));
         updateCamera(0);
-      } else {
-        // Hover parallax effect (very slight rotation based on mouse pos in window)
-        const centerX = window.innerWidth / 2;
-        const centerY = window.innerHeight / 2;
-        
-        const offsetX = (e.clientX - centerX) / centerX; // -1 to 1
-        const offsetY = (e.clientY - centerY) / centerY; // -1 to 1
-        
-        const { distance, azimuth, polar, target } = camState.current;
-        const tempAzimuth = azimuth - offsetX * 0.2;
-        const tempPolar = polar - offsetY * 0.2;
-        
-        const clampedPolar = Math.max(0.1, Math.min(Math.PI - 0.1, tempPolar));
-        
-        const x = target[0] + distance * Math.sin(clampedPolar) * Math.cos(tempAzimuth);
-        const y = target[1] + distance * Math.sin(clampedPolar) * Math.sin(tempAzimuth);
-        const z = target[2] + distance * Math.cos(clampedPolar);
-        
-        api.setCameraLookAt([x, y, z], target, 0.1);
       }
     };
 
     const onPointerUp = (e: PointerEvent) => {
       isDragging.current = false;
       container.releasePointerCapture(e.pointerId);
-    };
-    
-    const onMouseEnter = () => {
-      isHovering.current = true;
-    };
-    
-    const onMouseLeave = () => {
-      isHovering.current = false;
-      isDragging.current = false;
-      updateCamera(0.5); // smoothly return to center state
     };
 
     const onWheel = (e: WheelEvent) => {
@@ -144,7 +137,7 @@ export function CustomSketchfabViewer() {
         e.preventDefault(); // Prevent page scroll
         camState.current.distance += e.deltaY * 0.02;
         // Clamp distance
-        camState.current.distance = Math.max(1, Math.min(100, camState.current.distance));
+        camState.current.distance = Math.max(1, Math.min(1000, camState.current.distance));
         updateCamera(0);
       }
     };
@@ -152,16 +145,14 @@ export function CustomSketchfabViewer() {
     container.addEventListener("pointerdown", onPointerDown);
     container.addEventListener("pointermove", onPointerMove);
     container.addEventListener("pointerup", onPointerUp);
-    container.addEventListener("mouseenter", onMouseEnter);
-    container.addEventListener("mouseleave", onMouseLeave);
+    container.addEventListener("pointerenter", fetchCamera);
     container.addEventListener("wheel", onWheel, { passive: false });
 
     return () => {
       container.removeEventListener("pointerdown", onPointerDown);
       container.removeEventListener("pointermove", onPointerMove);
       container.removeEventListener("pointerup", onPointerUp);
-      container.removeEventListener("mouseenter", onMouseEnter);
-      container.removeEventListener("mouseleave", onMouseLeave);
+      container.removeEventListener("pointerenter", fetchCamera);
       container.removeEventListener("wheel", onWheel);
     };
   }, [api]);
