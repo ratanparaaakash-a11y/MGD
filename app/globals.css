@@ -2723,42 +2723,17 @@ textarea {
   inset: 0;
   z-index: 100000;
   /* above everything including the header */
-  display: flex;
-  pointer-events: all;
-}
-
-.splash-half {
-  position: relative;
-  width: 50%;
-  height: 100%;
   overflow: hidden;
   background: #000;
-  transition: transform 1.3s cubic-bezier(0.77, 0, 0.175, 1);
-  will-change: transform;
+  opacity: 1;
+  pointer-events: all;
+  transition: opacity 900ms ease;
+  will-change: opacity;
 }
 
-/* When tearing, slide halves apart */
-.splash-tearing .splash-half--left {
-  transform: translateX(-100%);
-}
-
-.splash-tearing .splash-half--right {
-  transform: translateX(100%);
-}
-
-/* Inner wrapper spans full viewport width, positioned so each half clips its portion */
-.splash-inner {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 200%;
-  /* = 100vw since parent is 50vw */
-  height: 100%;
-}
-
-.splash-inner--right {
-  left: -100%;
-  /* shift so the right portion of the content is visible */
+.splash-screen--fading {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* Video centered at reduced scale */
@@ -2767,7 +2742,8 @@ textarea {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 40%;
+  display: block;
+  width: clamp(180px, 40vw, 560px);
   height: auto;
   max-width: none;
   max-height: none;

@@ -1,7 +1,9 @@
 "use client";
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Stage } from "@react-three/drei";
+
+type SplashWindow = Window & { __muktaSplashComplete?: boolean };
 
 function Model(props: any) {
   const { scene } = useGLTF("/nissan_fairlady_z_s30240z_1978.glb");
@@ -9,6 +11,21 @@ function Model(props: any) {
 }
 
 export function CustomSketchfabViewer() {
+  const [splashComplete, setSplashComplete] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    return Boolean((window as SplashWindow).__muktaSplashComplete);
+  });
+
+  useEffect(() => {
+    const handleSplashComplete = () => setSplashComplete(true);
+
+    window.addEventListener("mukta:splash-complete", handleSplashComplete);
+    return () => window.removeEventListener("mukta:splash-complete", handleSplashComplete);
+  }, []);
+
   return (
     <div style={{ width: "100%", height: "100%", position: "relative", cursor: "grab", background: "transparent" }}>
       <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 0, 10], fov: 45 }}>

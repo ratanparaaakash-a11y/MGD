@@ -1,28 +1,17 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useProgress } from "@react-three/drei";
+
+const SPLASH_FADE_DURATION_MS = 900;
 
 export function SplashScreen() {
   const { active, progress } = useProgress();
   const [showText, setShowText] = useState(false);
   const [showSubText, setShowSubText] = useState(false);
   const [minTimeElapsed, setMinTimeElapsed] = useState(false);
-  const [isTearing, setIsTearing] = useState(false);
+  const [isFading, setIsFading] = useState(false);
   const [isRemoved, setIsRemoved] = useState(false);
-  const videoLeftRef = useRef<HTMLVideoElement>(null);
-  const videoRightRef = useRef<HTMLVideoElement>(null);
-
-  // Sync both videos to the same playback time
-  useEffect(() => {
-    const syncVideos = () => {
-      if (videoLeftRef.current && videoRightRef.current) {
-        videoRightRef.current.currentTime = videoLeftRef.current.currentTime;
-      }
-    };
-    const interval = setInterval(syncVideos, 100);
-    return () => clearInterval(interval);
-  }, []);
 
   // Timed text reveals
   useEffect(() => {
@@ -36,58 +25,35 @@ export function SplashScreen() {
     };
   }, []);
 
-  // Tear open once minimum time + model loaded
+  // Fade out once minimum time + model loaded
   useEffect(() => {
-    if (minTimeElapsed && (!active || progress === 100)) {
-      setIsTearing(true);
-      setTimeout(() => setIsRemoved(true), 1600);
+    if (!minTimeElapsed || (active && progress !== 100) || isFading) {
+      return;
     }
-  }, [minTimeElapsed, active, progress]);
+
+    setIsFading(true);
+    const timeout = setTimeout(() => {
+      (window as Window & { __muktaSplashComplete?: boolean }).__muktaSplashComplete = true;
+      window.dispatchEvent(new Event("mukta:splash-complete"));
+      setIsRemoved(true);
+    }, SPLASH_FADE_DURATION_MS);
+
+    return () => clearTimeout(timeout);
+  }, [minTimeElapsed, active, progress, isFading]);
 
   if (isRemoved) return null;
 
   return (
-    <div className={`splash-screen ${isTearing ? "splash-tearing" : ""}`} aria-hidden="true">
-      {/* Left half */}
-      <div className="splash-half splash-half--left">
-        <div className="splash-inner">
-          <video
-            ref={videoLeftRef}
-            src="/mukta-video.mp4"
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="splash-video"
-          />
-          <div className="splash-text-overlay">
-            <h1 className={`splash-mgd ${showText ? "splash-visible" : ""}`}>MGD</h1>
-            <p className={`splash-fullname ${showSubText ? "splash-visible" : ""}`}>
-              MUKTA GAME &amp; DEVELOPMENT
-            </p>
-          </div>
-        </div>
-      </div>
+    <div className={`splash-screen ${isFading ? "splash-screen--fading" : ""}`} aria-hidden="true">
+      <video autoPlay muted loop playsInline preload="auto" className="splash-video">
+        <source src="/video/520.mp4" type="video/mp4" />
+      </video>
 
-      {/* Right half */}
-      <div className="splash-half splash-half--right">
-        <div className="splash-inner splash-inner--right">
-          <video
-            ref={videoRightRef}
-            src="/mukta-video.mp4"
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="splash-video"
-          />
-          <div className="splash-text-overlay">
-            <h1 className={`splash-mgd ${showText ? "splash-visible" : ""}`}>MGD</h1>
-            <p className={`splash-fullname ${showSubText ? "splash-visible" : ""}`}>
-              MUKTA GAME &amp; DEVELOPMENT
-            </p>
-          </div>
-        </div>
+      <div className="splash-text-overlay">
+        <h1 className={`splash-mgd ${showText ? "splash-visible" : ""}`}>MGD</h1>
+        <p className={`splash-fullname ${showSubText ? "splash-visible" : ""}`}>
+          MUKTA GAME &amp; DEVELOPMENT
+        </p>
       </div>
     </div>
   );
