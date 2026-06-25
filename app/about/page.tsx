@@ -2,6 +2,149 @@
 
 import Link from "next/link";
 import { Footer } from "@/components/Footer";
+import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
+
+const AboutModelViewer = dynamic(
+  () => import("@/components/AboutModelViewer").then((mod) => mod.AboutModelViewer),
+  { ssr: false }
+);
+
+/* ─── Animated Circular Ring ─── */
+function SkillRing({
+  label,
+  percent,
+  color,
+  delay = 0,
+}: {
+  label: string;
+  percent: number;
+  color: string;
+  delay?: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setVisible(true);
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const radius = 54;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (percent / 100) * circumference;
+
+  return (
+    <div ref={ref} className="skill-ring-item" style={{ transitionDelay: `${delay}ms` }}>
+      <div className="skill-ring-svg-wrap">
+        <svg viewBox="0 0 120 120" className="skill-ring-svg">
+          <circle cx="60" cy="60" r={radius} className="skill-ring-track" />
+          <circle
+            cx="60"
+            cy="60"
+            r={radius}
+            className="skill-ring-progress"
+            style={{
+              stroke: color,
+              strokeDasharray: circumference,
+              strokeDashoffset: visible ? offset : circumference,
+              transitionDelay: `${delay}ms`,
+            }}
+          />
+        </svg>
+        <span className="skill-ring-percent">
+          {visible ? `${percent}%` : "0%"}
+        </span>
+      </div>
+      <span className="skill-ring-label">{label}</span>
+    </div>
+  );
+}
+
+/* ─── Timeline Step ─── */
+function TimelineStep({
+  num,
+  title,
+  desc,
+  index,
+}: {
+  num: string;
+  title: string;
+  desc: string;
+  index: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setVisible(true);
+      },
+      { threshold: 0.4 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className={`timeline-step ${visible ? "timeline-step--visible" : ""} ${index % 2 === 1 ? "timeline-step--right" : ""}`}
+      style={{ transitionDelay: `${index * 150}ms` }}
+    >
+      <div className="timeline-dot">
+        <span>{num}</span>
+      </div>
+      <div className="timeline-content">
+        <h3>{title}</h3>
+        <p>{desc}</p>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Flip Card ─── */
+function TeamFlipCard({
+  initials,
+  name,
+  role,
+  bio,
+}: {
+  initials: string;
+  name: string;
+  role: string;
+  bio: string;
+}) {
+  return (
+    <div className="flip-card">
+      <div className="flip-card-inner">
+        {/* Front */}
+        <div className="flip-card-front glass-card">
+          <div className="team-avatar">{initials}</div>
+          <h3>{name}</h3>
+          <p>{role}</p>
+        </div>
+        {/* Back */}
+        <div className="flip-card-back glass-card">
+          <h3>{name}</h3>
+          <p className="flip-bio">{bio}</p>
+          <span className="flip-hint">↩ Flip back</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function AboutPage() {
   return (
@@ -18,7 +161,7 @@ export default function AboutPage() {
         </p>
       </section>
 
-      {/* ── 2. OUR STORY ─────────────────────────────────── */}
+      {/* ── 2. OUR STORY + 3D MODEL ──────────────────────── */}
       <section
         className="content-section"
         style={{ background: "var(--bg-dark)" }}
@@ -48,10 +191,8 @@ export default function AboutPage() {
             </Link>
           </div>
 
-          <div className="about-story-visual">
-            <div className="logo-display">
-              <span>MUKTA</span>
-            </div>
+          <div className="about-story-visual about-story-visual--3d">
+            <AboutModelViewer />
           </div>
         </div>
       </section>
@@ -86,115 +227,83 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── 4. PROCESS ───────────────────────────────────── */}
+      {/* ── 4. PROCESS — SCROLLING TIMELINE ──────────────── */}
       <section
-        className="content-section process-section"
+        className="content-section"
         style={{ background: "var(--bg-dark)" }}
       >
-        <span className="section-kicker">PROCESS</span>
-        <h2 className="section-title">HOW WE WORK</h2>
-        <p className="section-subtitle">
-          A clear path from rough concept to playable, presentable experience.
-        </p>
+        <div className="section-heading">
+          <p>PROCESS</p>
+          <h2>HOW WE WORK</h2>
+          <span>
+            A clear path from rough concept to playable, presentable experience.
+          </span>
+        </div>
 
-        <div className="process-grid">
+        <div className="timeline">
+          <div className="timeline-line" />
           {[
             {
               num: "01",
               title: "Discover",
-              desc: "Understand your idea, users, goals, and target platform.",
+              desc: "We deep-dive into your idea, audience, goals, and target platform to chart the project DNA.",
             },
             {
               num: "02",
               title: "Design",
-              desc: "Shape characters, props, spaces, and visual systems in Blender.",
+              desc: "Characters, environments, props, and UI systems are crafted in Blender with cinematic polish.",
             },
             {
               num: "03",
               title: "Develop",
-              desc: "Bring the experience to life with Unity interactions and polish.",
+              desc: "Unity brings the vision to life — gameplay, physics, shaders, interactions, and platform builds.",
             },
             {
               num: "04",
               title: "Deliver",
-              desc: "Prepare builds and assets for web, mobile, desktop, or headset.",
+              desc: "Final QA, optimization, deployment to web, mobile, desktop, or XR headsets. Post-launch support included.",
             },
-          ].map((step) => (
-            <div className="process-card glass-card" key={step.num}>
-              <span className="process-number">{step.num}</span>
-              <h3>{step.title}</h3>
-              <p>{step.desc}</p>
-            </div>
+          ].map((step, i) => (
+            <TimelineStep key={step.num} {...step} index={i} />
           ))}
         </div>
       </section>
 
-      {/* ── 5. TECH STACK ────────────────────────────────── */}
+      {/* ── 5. TECH STACK — ANIMATED RINGS ────────────────── */}
       <section
         className="content-section"
         style={{ background: "var(--surface)" }}
       >
-        <span className="section-kicker">TECHNOLOGY</span>
-        <h2 className="section-title">OUR TOOLKIT</h2>
+        <div className="section-heading">
+          <p>TECHNOLOGY</p>
+          <h2>OUR TOOLKIT</h2>
+        </div>
 
-        <div className="tech-grid">
-          <div className="tech-card glass-card">
-            <div className="tech-icon tech-icon--blender">B</div>
-            <h3>Blender 3D</h3>
-            <p>
-              Industry-standard open-source 3D creation suite for modeling,
-              sculpting, texturing, rigging, animation, and rendering. Our
-              artists craft every asset with precision and artistry.
-            </p>
-          </div>
-
-          <div className="tech-card glass-card">
-            <div className="tech-icon tech-icon--unity">U</div>
-            <h3>Unity Engine</h3>
-            <p>
-              The world&apos;s leading real-time development platform. We use
-              Unity for cross-platform game builds, AR/VR applications,
-              interactive simulations, and product configurators.
-            </p>
-          </div>
+        <div className="skill-rings-container">
+          <SkillRing label="Blender 3D" percent={95} color="#ea7600" delay={0} />
+          <SkillRing label="Unity Engine" percent={92} color="#7b68ee" delay={150} />
+          <SkillRing label="C# / Scripting" percent={88} color="#00d4ff" delay={300} />
+          <SkillRing label="AR / VR" percent={85} color="#e3000b" delay={450} />
+          <SkillRing label="Shader Dev" percent={78} color="#f5a623" delay={600} />
+          <SkillRing label="Web 3D" percent={82} color="#4ade80" delay={750} />
         </div>
       </section>
 
-      {/* ── 6. TEAM ──────────────────────────────────────── */}
+      {/* ── 6. BLENDER SHOWCASE ─────────────────────────── */}
       <section
         className="content-section"
         style={{ background: "var(--bg-dark)" }}
       >
-        <span className="section-kicker">THE TEAM</span>
-        <h2 className="section-title">MEET THE CREATORS</h2>
+        <div className="section-heading">
+          <p>SHOWCASE</p>
+          <h2>BLENDER MODELS</h2>
+          <span>A glimpse of our detailed 3D artwork and models.</span>
+        </div>
 
-        <div className="team-grid">
-          {[
-            {
-              initials: "DM",
-              name: "Dhiraj Mukta",
-              role: "Founder & Lead Developer",
-            },
-            {
-              initials: "AP",
-              name: "Arjun Patil",
-              role: "3D Artist & Animator",
-            },
-            {
-              initials: "SK",
-              name: "Sneha Kulkarni",
-              role: "AR/VR Specialist",
-            },
-            {
-              initials: "RV",
-              name: "Rohan Verma",
-              role: "Unity Developer",
-            },
-          ].map((member) => (
-            <div className="team-card glass-card" key={member.initials}>
-              <div className="team-avatar">{member.initials}</div>
-              <h3>{member.name}</h3>
-              <p>{member.role}</p>
+        <div className="showcase-grid">
+          {[ "B2", "B3", "B4", "B5", "B6", "B7"].map((img) => (
+            <div key={img} className="showcase-item">
+              <img src={`/${img}.jpg`} alt={`Blender Showcase ${img}`} loading="lazy" />
             </div>
           ))}
         </div>
