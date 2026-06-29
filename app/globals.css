@@ -424,6 +424,7 @@ textarea {
   position: absolute;
   top: 50%;
   left: clamp(1rem, 5vw, 5rem);
+  transform: translateY(-50%);
   z-index: 3;
   width: min(31rem, 34vw);
 }
