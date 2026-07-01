@@ -1,35 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { Footer } from "@/components/Footer";
-import { Parallax, ParallaxLayer } from "@react-spring/parallax";
 
 export default function ContactPage() {
-  const [pages, setPages] = useState(3);
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (contentRef.current) {
-        // Calculate exactly how many viewports (vh) the content takes up
-        const contentHeight = contentRef.current.scrollHeight;
-        const vh = window.innerHeight;
-        // Add a tiny bit of buffer (0.05) to ensure nothing is clipped
-        setPages(contentHeight / vh + 0.05);
-      }
-    };
-
-    handleResize(); // Initial calculation
-    
-    // Add small delay for initial load to ensure fonts/images are rendered
-    setTimeout(handleResize, 100);
-    setTimeout(handleResize, 500);
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -52,12 +27,9 @@ export default function ContactPage() {
 
   return (
     <div className="parallax-contact-wrapper">
-      <Parallax pages={pages} className="parallax-container">
 
 
         {/* ── ALL page content in one layer (speed=0 means natural scrolling) ── */}
-        <ParallaxLayer offset={0} speed={0} factor={pages} className="parallax-content-layer">
-          <div ref={contentRef} style={{ width: "100%" }}>
 
           <div className="parallax-video-layer">
             <video autoPlay muted loop playsInline className="contact-bg-video">
@@ -370,11 +342,7 @@ export default function ContactPage() {
           </section>
 
           <Footer />
-          </div>
 
-        </ParallaxLayer>
-
-      </Parallax>
     </div>
   );
 }

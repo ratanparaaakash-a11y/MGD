@@ -283,9 +283,8 @@ export default function AboutPage() {
         <div className="skill-rings-container">
           <SkillRing label="Blender 3D" percent={95} color="#ea7600" delay={0} />
           <SkillRing label="Unity Engine" percent={92} color="#7b68ee" delay={150} />
-          <SkillRing label="C# / Scripting" percent={88} color="#00d4ff" delay={300} />
           <SkillRing label="AR / VR" percent={85} color="#e3000b" delay={450} />
-          <SkillRing label="Shader Dev" percent={78} color="#f5a623" delay={600} />
+          
           <SkillRing label="Web 3D" percent={82} color="#4ade80" delay={750} />
         </div>
       </section>
@@ -302,7 +301,7 @@ export default function AboutPage() {
         </div>
 
         <div className="showcase-grid">
-          {[ "B2", "B3", "B4", "B5", "B6", "B7"].map((img) => (
+          {[ "B2", "B4", "B5", "B3", "B6", "B7"].map((img) => (
             <div key={img} className="showcase-item">
               <Image
                 src={`/${img}.jpg`}
