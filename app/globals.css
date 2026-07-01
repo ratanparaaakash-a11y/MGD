@@ -1657,6 +1657,19 @@ textarea {
   transform: translateY(-2px);
 }
 
+.footer-social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: color 200ms ease, transform 200ms ease;
+}
+
+.footer-social-icon:hover {
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
 /* ═══════════════════════════════════════════
    STATS STRIP (dark)
    ═══════════════════════════════════════════ */

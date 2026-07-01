@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Footer } from "@/components/Footer";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
+import { AnimatedStat } from "@/components/AnimatedStat";
 
 const AboutModelViewer = dynamic(
   () => import("@/components/AboutModelViewer").then((mod) => mod.AboutModelViewer),
@@ -154,7 +154,7 @@ export default function AboutPage() {
       <section className="page-hero">
         <span className="section-kicker">ABOUT US</span>
         <h1 className="section-title">
-          WE ARE <span className="gradient-text">MUKTA</span>
+          WE ARE <span className="gradient-text">MGD</span>
         </h1>
         <p className="section-subtitle">
           A passionate Blender + Unity studio building immersive 3D worlds,
@@ -281,12 +281,10 @@ export default function AboutPage() {
         </div>
 
         <div className="skill-rings-container">
-          <SkillRing label="Blender 3D" percent={95} color="#ea7600" delay={0} />
-          <SkillRing label="Unity Engine" percent={92} color="#7b68ee" delay={150} />
-          <SkillRing label="C# / Scripting" percent={88} color="#00d4ff" delay={300} />
+          <SkillRing label="Blender 3D" percent={99} color="#ea7600" delay={0} />
+          <SkillRing label="Unity Engine" percent={99} color="#7b68ee" delay={150} />
           <SkillRing label="AR / VR" percent={85} color="#e3000b" delay={450} />
-          <SkillRing label="Shader Dev" percent={78} color="#f5a623" delay={600} />
-          <SkillRing label="Web 3D" percent={82} color="#4ade80" delay={750} />
+          <SkillRing label="Web 3D" percent={96} color="#4ade80" delay={750} />
         </div>
       </section>
 
@@ -302,14 +300,9 @@ export default function AboutPage() {
         </div>
 
         <div className="showcase-grid">
-          {[ "B2", "B3", "B4", "B5", "B6", "B7"].map((img) => (
+          {["B2", "B4", "B5", "B3", "B6", "B7"].map((img) => (
             <div key={img} className="showcase-item">
-              <Image
-                src={`/${img}.jpg`}
-                alt={`Blender Showcase ${img}`}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
+              <img src={`/${img}.jpg`} alt={`Blender Showcase ${img}`} loading="lazy" />
             </div>
           ))}
         </div>
@@ -323,10 +316,7 @@ export default function AboutPage() {
           { number: "8", label: "Industry Verticals" },
           { number: "100%", label: "Client Satisfaction" },
         ].map((stat) => (
-          <div className="stat-item" key={stat.label}>
-            <span className="stat-number">{stat.number}</span>
-            <span className="stat-label">{stat.label}</span>
-          </div>
+          <AnimatedStat key={stat.label} value={stat.number} label={stat.label} />
         ))}
       </section>
 
