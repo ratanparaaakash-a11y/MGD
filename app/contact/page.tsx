@@ -13,6 +13,8 @@ export default function ContactPage() {
     budget: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState({ type: "", message: "" });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -20,9 +22,30 @@ export default function ContactPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert("Thank you! We will get back to you soon.");
+    setIsSubmitting(true);
+    setStatus({ type: "", message: "" });
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      if (response.ok) {
+        setStatus({ type: "success", message: "Thank you! We will get back to you soon." });
+        setForm({ name: "", email: "", phone: "", projectType: "", budget: "", message: "" });
+      } else {
+        const data = await response.json();
+        setStatus({ type: "error", message: data.error || "Failed to send message." });
+      }
+    } catch (error) {
+      setStatus({ type: "error", message: "An unexpected error occurred. Please try again." });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -67,7 +90,7 @@ export default function ContactPage() {
               <form className="form-grid" onSubmit={handleSubmit}>
                 {/* Name */}
                 <div className="form-group">
-                  <label htmlFor="name">Your Name</label>
+                  <label htmlFor="name">Your Name *</label>
                   <input
                     id="name"
                     name="name"
@@ -75,11 +98,12 @@ export default function ContactPage() {
                     placeholder="John Doe"
                     value={form.name}
                     onChange={handleChange}
+                    required
                   />
                 </div>
                 {/* Email */}
                 <div className="form-group">
-                  <label htmlFor="email">Email Address</label>
+                  <label htmlFor="email">Email Address *</label>
                   <input
                     id="email"
                     name="email"
@@ -87,6 +111,7 @@ export default function ContactPage() {
                     placeholder="john@example.com"
                     value={form.email}
                     onChange={handleChange}
+                    required
                   />
                 </div>
                 {/* Phone */}
@@ -145,7 +170,7 @@ export default function ContactPage() {
                 </div>
                 {/* Message – full width */}
                 <div className="form-group" style={{ gridColumn: "1 / -1" }}>
-                  <label htmlFor="message">Project Details</label>
+                  <label htmlFor="message">Project Details *</label>
                   <textarea
                     id="message"
                     name="message"
@@ -153,11 +178,17 @@ export default function ContactPage() {
                     rows={6}
                     value={form.message}
                     onChange={handleChange}
+                    required
                   />
                 </div>
-                <button type="submit" className="submit-btn">
-                  SEND MESSAGE →
+                <button type="submit" className="submit-btn" disabled={isSubmitting}>
+                  {isSubmitting ? "SENDING..." : "SEND MESSAGE →"}
                 </button>
+                {status.message && (
+                  <div style={{ marginTop: "1rem", color: status.type === "success" ? "#4ade80" : "#ff4d4d", fontWeight: "bold" }}>
+                    {status.message}
+                  </div>
+                )}
               </form>
             </div>
             {/* ── Right: Info Stack ── */}
