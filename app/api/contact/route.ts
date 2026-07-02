@@ -24,6 +24,7 @@ export async function POST(request: Request) {
     const mailOptions = {
       from: process.env.SMTP_USER,
       to: process.env.MAIL_TO,
+      replyTo: email,
       subject: `New Contact Request: ${name} - ${projectType || 'General Inquiry'}`,
       text: `
 Name: ${name}
@@ -52,6 +53,6 @@ ${message}
     return NextResponse.json({ success: true, message: 'Email sent successfully' }, { status: 200 });
   } catch (error) {
     console.error('Error sending email:', error);
-    return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to send email, try again' }, { status: 500 });
   }
 }

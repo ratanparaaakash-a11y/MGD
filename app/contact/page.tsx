@@ -45,6 +45,9 @@ export default function ContactPage() {
       setStatus({ type: "error", message: "An unexpected error occurred. Please try again." });
     } finally {
       setIsSubmitting(false);
+      setTimeout(() => {
+        setStatus({ type: "", message: "" });
+      }, 4000);
     }
   };
 
@@ -95,7 +98,7 @@ export default function ContactPage() {
                     id="name"
                     name="name"
                     type="text"
-                    placeholder="John Doe"
+                    placeholder="Your Name"
                     value={form.name}
                     onChange={handleChange}
                     required
@@ -108,7 +111,7 @@ export default function ContactPage() {
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="john@example.com"
+                    placeholder="Your email address"
                     value={form.email}
                     onChange={handleChange}
                     required
@@ -121,7 +124,7 @@ export default function ContactPage() {
                     id="phone"
                     name="phone"
                     type="tel"
-                    placeholder="+91 00000 00000"
+                    placeholder="Your phone number"
                     value={form.phone}
                     onChange={handleChange}
                   />
@@ -182,7 +185,27 @@ export default function ContactPage() {
                   />
                 </div>
                 <button type="submit" className="submit-btn" disabled={isSubmitting}>
-                  {isSubmitting ? "SENDING..." : "SEND MESSAGE →"}
+                  {isSubmitting ? (
+                    <>
+                      <svg
+                        className="spinner"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        style={{ animation: 'spin 1s linear infinite', marginRight: '8px' }}
+                      >
+                        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                      </svg>
+                      SENDING...
+                    </>
+                  ) : (
+                    "SEND MESSAGE →"
+                  )}
                 </button>
                 {status.message && (
                   <div style={{ marginTop: "1rem", color: status.type === "success" ? "#4ade80" : "#ff4d4d", fontWeight: "bold" }}>
@@ -210,8 +233,8 @@ export default function ContactPage() {
                 </svg>
                 <h4>EMAIL</h4>
                 <p>
-                  <a href="mailto:hello@muktagamedev.com">
-                    hello@muktagamedev.com
+                  <a href="contact@mgdgames.ai">
+                    contact@mgdgames.ai
                   </a>
                 </p>
               </div>
@@ -231,7 +254,7 @@ export default function ContactPage() {
                 </svg>
                 <h4>PHONE</h4>
                 <p>
-                  <a href="tel:+910000000000">+91 00000 00000</a>
+                  <a href="tel:+918433886685">8433886685</a>
                 </p>
               </div>
               {/* Location Card */}
