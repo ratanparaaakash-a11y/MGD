@@ -85,7 +85,7 @@ export function Footer() {
       {/* ── Bottom bar ── */}
       <div className="footer-bottom">
         <span>© 2026 Mukta Game &amp; Development. All rights reserved.</span>
-        <span>Crafted with ❤️ in India</span>
+        {/* <span>Crafted with ❤️ in India</span> */}
       </div>
     </footer>
   );

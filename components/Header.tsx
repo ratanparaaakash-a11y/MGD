@@ -27,16 +27,26 @@ export function Header() {
       className={`site-header${isScrolled ? " site-header--solid" : ""}`}
     >
       {/* ── Brand ── */}
-      <Link href="/" className="site-brand" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <Image src="/mukta-logo-trans.png" alt="Mukta Logo" width={48} height={48} className="brand-logo" style={{ objectFit: 'contain', width: 'auto', height: '100%', maxHeight: '48px' }} />
-        <span style={{ display: 'flex', flexDirection: 'column' }}>
+      <Link href="/" className="site-brand">
+        <Image
+          src="/mukta-logo-trans.png"
+          alt="Mukta Logo"
+          width={48}
+          height={48}
+          className="brand-logo"
+          priority
+        />
+        <span className="site-brand-text">
           <strong>MUKTA</strong>
           <small>GAME &amp; DEVELOPMENT</small>
         </span>
       </Link>
 
       {/* ── Nav ── */}
-      <nav className={`site-nav${isMenuOpen ? " nav-open" : ""}`}>
+      <nav
+        id="site-navigation"
+        className={`site-nav${isMenuOpen ? " nav-open" : ""}`}
+      >
         <Link href="/" className={pathname === "/" ? "active" : ""}>
           Home
         </Link>
@@ -66,6 +76,8 @@ export function Header() {
       <button
         className="mobile-menu-btn"
         aria-label="Toggle menu"
+        aria-controls="site-navigation"
+        aria-expanded={isMenuOpen}
         onClick={() => setIsMenuOpen((prev) => !prev)}
       >
         <span />
