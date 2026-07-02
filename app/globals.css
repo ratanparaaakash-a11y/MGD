@@ -886,6 +886,14 @@ textarea {
   z-index: 1;
 }
 
+.parallax-video-layer .page-hero {
+  background: transparent;
+}
+
+.parallax-video-layer .page-hero::before {
+  opacity: 0.15;
+}
+
 .page-hero .section-subtitle {
   margin: 1rem auto 0;
   text-align: center;
@@ -1402,6 +1410,7 @@ textarea {
 
 /* ── Video Background ── */
 .parallax-video-layer {
+  --contact-video-bg: #02030a;
   position: relative;
   width: 100%;
   height: 100%;
@@ -1654,6 +1663,19 @@ textarea {
 
 .social-btn:hover {
   border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.footer-social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: color 200ms ease, transform 200ms ease;
+}
+
+.footer-social-icon:hover {
   color: var(--accent);
   transform: translateY(-2px);
 }
