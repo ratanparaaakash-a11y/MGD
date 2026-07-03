@@ -4,6 +4,8 @@ import dynamic from "next/dynamic";
 import { Footer } from "@/components/Footer";
 import Link from "next/link";
 import { Suspense } from "react";
+import { AnimatedStat } from "@/components/AnimatedStat";
+import { color } from "three/tsl";
 
 /* Lazy-load heavy components so they don't block initial render */
 const CustomSketchfabViewer = dynamic(
@@ -87,10 +89,7 @@ export default function Home() {
           { number: "8", label: "Industry Verticals" },
           { number: "100%", label: "Client Satisfaction" },
         ].map((stat) => (
-          <div key={stat.label} className="stat-item">
-            <div className="stat-number">{stat.number}</div>
-            <div className="stat-label">{stat.label}</div>
-          </div>
+          <AnimatedStat key={stat.label} value={stat.number} label={stat.label} />
         ))}
       </section>
 
@@ -140,7 +139,7 @@ export default function Home() {
       </section>
 
       {/* ─── PORTFOLIO ─── */}
-      <section
+      {/* <section
         id="work"
         className="content-section"
         style={{ background: "var(--bg-dark)" }}
@@ -190,7 +189,7 @@ export default function Home() {
             See Full Portfolio →
           </Link>
         </div>
-      </section>
+      </section> */}
 
       {/* ─── WHY CHOOSE US ─── */}
       <section
@@ -269,21 +268,21 @@ export default function Home() {
           {[
             {
               quote:
-                "Mukta transformed our concept into a stunning 3D experience.",
-              name: "Rahul Sharma",
-              role: "CEO at TechVista",
+                "MGD's ability to create highly immersive AR/VR experiences is truly world-class. They delivered beyond our expectations.",
+              name: "Dr. Ani Atanasova",
+              role: "Pixelhunters (Dubai)",
             },
             {
               quote:
-                "Their VR training module reduced our onboarding time by 40%.",
-              name: "Priya Patel",
-              role: "Director at IndusTrain",
+                "The 3D assets and game mechanics they produced fit perfectly into our workflow. A reliable and highly skilled technical team.",
+              name: "Nao Udagawa",
+              role: "Bandai Namco Entertainment Inc. (Malaysia)",
             },
             {
               quote:
-                "The product visualization increased our conversion rate by 60%.",
-              name: "Amit Kumar",
-              role: "Founder at DesignPro",
+                "Their deep understanding of Unity and Blender helped us bring complex simulation logic to life with incredible visual fidelity.",
+              name: "Eng. Iliya Atanasov",
+              role: "Pixelhunters (Dubai)",
             },
           ].map((t, i) => (
             <div
