@@ -5,7 +5,6 @@ import { Footer } from "@/components/Footer";
 import Link from "next/link";
 import { Suspense } from "react";
 import { AnimatedStat } from "@/components/AnimatedStat";
-import { color } from "three/tsl";
 
 /* Lazy-load heavy components so they don't block initial render */
 const CustomSketchfabViewer = dynamic(

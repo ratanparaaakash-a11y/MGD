@@ -1,15 +1,18 @@
 "use client";
-import React, { Suspense, useEffect, useState, useRef } from "react";
+
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Stage } from "@react-three/drei";
+import { OrbitControls, Stage, useGLTF } from "@react-three/drei";
 
 type SplashWindow = Window & {
   __muktaHeroModelReady?: boolean;
   __muktaSplashComplete?: boolean;
 };
 
-function Model(props: any) {
-  const { scene } = useGLTF("/nissan_fairlady_z_s30240z_1978.glb");
+const HERO_MODEL_PATH = "/nissan_fairlady_z_s30240z_1978.meshopt.glb";
+
+function Model() {
+  const { scene } = useGLTF(HERO_MODEL_PATH);
 
   useEffect(() => {
     const splashWindow = window as SplashWindow;
@@ -17,34 +20,26 @@ function Model(props: any) {
     window.dispatchEvent(new Event("mukta:hero-model-ready"));
   }, []);
 
-  return <primitive object={scene} {...props} />;
+  return <primitive object={scene} />;
 }
 
-/* Periodically invalidate frames for auto-rotate in "demand" mode */
 function FrameInvalidator() {
   const { invalidate } = useThree();
 
   useEffect(() => {
-    let id: number;
-    const loop = () => {
-      invalidate();
-      id = requestAnimationFrame(loop);
-    };
-    // Invalidate at ~30fps instead of 60fps for auto-rotate
-    const interval = setInterval(() => {
+    const interval = window.setInterval(() => {
       invalidate();
     }, 33);
 
-    return () => {
-      cancelAnimationFrame(id);
-      clearInterval(interval);
-    };
+    return () => window.clearInterval(interval);
   }, [invalidate]);
 
   return null;
 }
 
 export function CustomSketchfabViewer() {
+  const viewerRef = useRef<HTMLDivElement>(null);
+  const [isHeroVisible, setIsHeroVisible] = useState(true);
   const [splashComplete, setSplashComplete] = useState(() => {
     if (typeof window === "undefined") {
       return false;
@@ -58,22 +53,37 @@ export function CustomSketchfabViewer() {
 
     window.addEventListener("mukta:splash-complete", handleSplashComplete);
 
-    // Fallback: if event was missed or never fired, poll briefly then force-enable
-    const fallback = setTimeout(() => {
+    const fallback = window.setTimeout(() => {
       setSplashComplete(true);
-    }, 4000); // Absolute max wait — 4s after mount
+    }, 4000);
 
     return () => {
-      window.removeEventListener(
-        "mukta:splash-complete",
-        handleSplashComplete
-      );
-      clearTimeout(fallback);
+      window.removeEventListener("mukta:splash-complete", handleSplashComplete);
+      window.clearTimeout(fallback);
     };
   }, []);
 
+  useEffect(() => {
+    const el = viewerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsHeroVisible(entry.isIntersecting);
+      },
+      { threshold: 0.05, rootMargin: "80px 0px 80px 0px" }
+    );
+
+    observer.observe(el);
+
+    return () => observer.disconnect();
+  }, []);
+
+  const shouldAnimateHero = splashComplete && isHeroVisible;
+
   return (
     <div
+      ref={viewerRef}
       style={{
         width: "100%",
         height: "100%",
@@ -95,17 +105,17 @@ export function CustomSketchfabViewer() {
         </Suspense>
         <OrbitControls
           makeDefault
-          autoRotate={splashComplete}
+          autoRotate={shouldAnimateHero}
           autoRotateSpeed={1.5}
           enableZoom={false}
           enablePan={false}
           minPolarAngle={0}
           maxPolarAngle={Math.PI / 2 + 0.1}
         />
-        {splashComplete && <FrameInvalidator />}
+        {shouldAnimateHero && <FrameInvalidator />}
       </Canvas>
     </div>
   );
 }
 
-useGLTF.preload("/nissan_fairlady_z_s30240z_1978.glb");
+useGLTF.preload(HERO_MODEL_PATH);

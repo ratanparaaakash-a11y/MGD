@@ -83,6 +83,7 @@ function ShowcaseCard({
   isVisible: boolean;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const tiltRef = useRef({ x: 0, y: 0 });
   const rafRef = useRef<number>(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -114,7 +115,48 @@ function ShowcaseCard({
     setIsHovered(true);
   }, []);
 
-  // Simple scroll-based fade and slight upward shift
+  useEffect(() => {
+    if (card.type !== "video") return;
+
+    const cardEl = cardRef.current;
+    const videoEl = videoRef.current;
+    if (!cardEl || !videoEl) return;
+
+    const pauseVideo = () => {
+      videoEl.pause();
+    };
+
+    const playVideo = () => {
+      const playPromise = videoEl.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          pauseVideo();
+        });
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          playVideo();
+          return;
+        }
+
+        pauseVideo();
+      },
+      { threshold: 0.2, rootMargin: "120px 0px 120px 0px" }
+    );
+
+    observer.observe(cardEl);
+    pauseVideo();
+
+    return () => {
+      observer.disconnect();
+      pauseVideo();
+    };
+  }, [card.type]);
+
+  // Simple visibility fade and slight upward shift
   const staggerOffset = index * 0.15;
   const cardProgress = Math.max(
     0,
@@ -175,8 +217,8 @@ function ShowcaseCard({
         >
           {card.type === "video" ? (
             <video
+              ref={videoRef}
               src={card.src}
-              autoPlay
               muted
               loop
               playsInline
@@ -285,63 +327,28 @@ function ShowcaseCard({
 /* ── Main showcase component ── */
 export function ShowcaseReel() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const progressRef = useRef(0);
   const [renderProgress, setRenderProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const particles = useParticles(8); // Reduced from 20 to 8
-  const lastUpdateRef = useRef(0);
 
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
 
-    let rafId: number;
-    let isIntersecting = false;
-
-    const onScroll = () => {
-      if (!isIntersecting) return;
-
-      const rect = el.getBoundingClientRect();
-      const windowH = window.innerHeight;
-      const raw = (windowH - rect.top) / (windowH + rect.height);
-      const clamped = Math.max(0, Math.min(1, raw));
-
-      progressRef.current = clamped;
-
-      // Throttle React re-renders to ~30fps instead of 60fps
-      const now = performance.now();
-      if (now - lastUpdateRef.current > 33) {
-        lastUpdateRef.current = now;
-        setRenderProgress(clamped);
-        setIsVisible(clamped > 0.05);
-      }
-
-      rafId = requestAnimationFrame(onScroll);
-    };
-
     const observer = new IntersectionObserver(
       ([entry]) => {
-        isIntersecting = entry.isIntersecting;
-        if (isIntersecting) {
-          rafId = requestAnimationFrame(onScroll);
-        } else {
-          cancelAnimationFrame(rafId);
-          // Stop tracking when not visible
-          setIsVisible(false);
-        }
+        setIsVisible(entry.isIntersecting);
+        setRenderProgress(entry.isIntersecting ? 1 : 0);
       },
-      { threshold: 0, rootMargin: "100px 0px 100px 0px" }
+      { threshold: 0.08, rootMargin: "120px 0px 120px 0px" }
     );
 
     observer.observe(el);
 
-    return () => {
-      observer.disconnect();
-      cancelAnimationFrame(rafId);
-    };
+    return () => observer.disconnect();
   }, []);
 
-  // Spotlight position driven by scroll
+  // Static spotlight states avoid re-rendering continuously during scroll.
   const spotlightX = 20 + renderProgress * 60;
   const spotlightY = 30 + renderProgress * 40;
 
