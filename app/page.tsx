@@ -35,13 +35,18 @@ export default function Home() {
             style={{
               width: "100%",
               height: "100%",
-              opacity: 0.7,
-              background: "black",
+              opacity: 0.92,
+              background:
+                "radial-gradient(circle at 70% 45%, rgba(255, 48, 64, 0.26), transparent 36%), radial-gradient(circle at 54% 52%, rgba(255, 255, 255, 0.08), transparent 30%), #07080c",
               overflow: "hidden",
               position: "relative",
             }}
           >
-            <Suspense fallback={null}>
+            <Suspense
+              fallback={
+                <div className="hero-model-fallback">Loading 3D car</div>
+              }
+            >
               <CustomSketchfabViewer />
             </Suspense>
           </div>

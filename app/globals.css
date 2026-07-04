@@ -154,7 +154,7 @@ textarea {
   left: clamp(1rem, 3vw, 2rem);
   z-index: 10;
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr;
   align-items: center;
   gap: 1rem;
   min-height: 4.2rem;
@@ -250,29 +250,6 @@ textarea {
 .site-nav a:hover::after,
 .site-nav a.active::after {
   transform: scaleX(1);
-}
-
-/* Header CTA */
-.header-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.6rem;
-  padding: 0 1.25rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: #fff;
-  background: var(--accent);
-  box-shadow: 0 0 0 rgba(227, 0, 11, 0);
-  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
-  white-space: nowrap;
-  letter-spacing: 0.02em;
-}
-
-.header-cta:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0 28px var(--accent-glow);
 }
 
 /* Mobile menu */
@@ -405,6 +382,19 @@ textarea {
   justify-content: center;
   pointer-events: none;
   background: var(--bg-darker);
+}
+
+.hero-model-fallback {
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(8, 9, 13, 0.72);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .hero-video {
@@ -2817,7 +2807,7 @@ textarea {
 
 @media (max-width: 920px) {
   .site-header {
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 0.75rem;
   }
 
@@ -2938,13 +2928,6 @@ textarea {
 
   .site-brand small {
     font-size: 0.54rem;
-  }
-
-  .header-cta {
-    display: none;
-    min-height: 2.4rem;
-    padding: 0 0.75rem;
-    font-size: 0.75rem;
   }
 
   .site-nav {
@@ -3258,7 +3241,7 @@ textarea {
     top: 0.75rem;
     right: 1rem;
     left: 1rem;
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     width: auto;
     max-width: calc(100vw - 2rem);
   }

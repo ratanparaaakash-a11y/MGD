@@ -2,7 +2,7 @@
 
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls, Stage, useGLTF } from "@react-three/drei";
+import { Center, Html, OrbitControls, useGLTF } from "@react-three/drei";
 
 type SplashWindow = Window & {
   __muktaHeroModelReady?: boolean;
@@ -20,7 +20,19 @@ function Model() {
     window.dispatchEvent(new Event("mukta:hero-model-ready"));
   }, []);
 
-  return <primitive object={scene} />;
+  return (
+    <Center>
+      <primitive object={scene} rotation={[0, -0.25, 0]} scale={1.8} />
+    </Center>
+  );
+}
+
+function ModelFallback() {
+  return (
+    <Html center>
+      <div className="hero-model-fallback">Loading 3D car</div>
+    </Html>
+  );
 }
 
 function FrameInvalidator() {
@@ -93,15 +105,18 @@ export function CustomSketchfabViewer() {
       }}
     >
       <Canvas
-        shadows={splashComplete}
-        dpr={splashComplete ? [1, 1.5] : [0.5, 1]}
+        dpr={[0.6, 1]}
         frameloop="demand"
-        camera={{ position: [0, 0, 10], fov: 45 }}
+        camera={{ position: [0, 1.1, 8], fov: 42 }}
+        gl={{ antialias: false, alpha: true, powerPreference: "high-performance" }}
       >
-        <Suspense fallback={null}>
-          <Stage environment="city" intensity={0.5} adjustCamera>
-            <Model />
-          </Stage>
+        <ambientLight intensity={2.8} />
+        <hemisphereLight args={["#ffffff", "#510008", 1.35]} />
+        <directionalLight position={[4, 5, 6]} intensity={4.2} />
+        <directionalLight position={[-3, 2, -4]} intensity={1.8} color="#ff3148" />
+        <pointLight position={[0, 1.5, 3]} intensity={2.2} color="#ffffff" distance={7} />
+        <Suspense fallback={<ModelFallback />}>
+          <Model />
         </Suspense>
         <OrbitControls
           makeDefault

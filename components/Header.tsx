@@ -68,10 +68,6 @@ export function Header() {
       </nav>
 
       {/* ── CTA ── */}
-      <Link href="/contact" className="header-cta">
-        Get Started
-      </Link>
-
       {/* ── Mobile menu button ── */}
       <button
         className="mobile-menu-btn"
