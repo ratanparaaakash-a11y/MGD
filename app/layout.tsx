@@ -5,7 +5,10 @@ import { SplashScreen } from "@/components/SplashScreen";
 
 export const metadata: Metadata = {
   title: "Mukta Game & Development",
-  description: "A Blender + Unity powered studio crafting games, AR/VR apps, simulations, and interactive 3D experiences."
+  description: "A Blender + Unity powered studio crafting games, AR/VR apps, simulations, and interactive 3D experiences.",
+  icons: {
+    icon: "/mukta logo-trans.png",
+  },
 };
 
 export default function RootLayout({
