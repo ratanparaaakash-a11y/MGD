@@ -67,7 +67,7 @@ export function CustomSketchfabViewer() {
 
     const fallback = window.setTimeout(() => {
       setSplashComplete(true);
-    }, 4000);
+    }, 2000);
 
     return () => {
       window.removeEventListener("mukta:splash-complete", handleSplashComplete);
