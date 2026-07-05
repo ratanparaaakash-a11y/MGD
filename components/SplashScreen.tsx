@@ -5,7 +5,7 @@ import { useProgress } from "@react-three/drei";
 import { usePathname } from "next/navigation";
 
 const SPLASH_FADE_DURATION_MS = 900;
-const MIN_SPLASH_DURATION_MS = 2500; // Reduced from 5000ms to 2500ms
+const MIN_SPLASH_DURATION_MS = 2500;
 
 export function SplashScreen() {
   const pathname = usePathname();
@@ -55,7 +55,7 @@ export function SplashScreen() {
     };
   }, [shouldSkip]);
 
-  // Fade out once minimum time + model loaded
+  // Fade out once minimum time + optimized model loaded.
   const startFadeOut = useCallback(() => {
     if (isFading) return;
     setIsFading(true);

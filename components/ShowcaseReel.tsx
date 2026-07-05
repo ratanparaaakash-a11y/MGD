@@ -1,16 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-
-/* ═══════════════════════════════════════════════════════════════
-   ADVANCED SHOWCASE REEL (PERFORMANCE-OPTIMIZED)
-   - Scroll-driven 3D perspective transforms via CSS variables (no React re-renders)
-   - Mouse-tracking tilt (per-card) via direct DOM manipulation
-   - IntersectionObserver for visibility detection
-   - Reduced particle count (8 instead of 20)
-   - Videos lazy-loaded
-   ═══════════════════════════════════════════════════════════════ */
 
 interface CardData {
   type: "video" | "image";
@@ -54,78 +45,56 @@ const CARDS: CardData[] = [
   },
 ];
 
-/* ── Particle system (reduced from 20 to 8) ── */
-function useParticles(count: number) {
-  const [particles] = useState(() =>
-    Array.from({ length: count }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: 2 + Math.random() * 4,
-      duration: 4 + Math.random() * 8,
-      delay: Math.random() * 6,
-      opacity: 0.15 + Math.random() * 0.35,
-    }))
-  );
-  return particles;
-}
-
-/* ── Single showcase card with 3D tilt ── */
 function ShowcaseCard({
   card,
   index,
-  progress,
   isVisible,
 }: {
   card: CardData;
   index: number;
-  progress: number;
   isVisible: boolean;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const tiltRef = useRef({ x: 0, y: 0 });
-  const rafRef = useRef<number>(0);
-  const [isHovered, setIsHovered] = useState(false);
-  // Use a ref-driven tilt to avoid re-renders on mouse move
-  const [tiltState, setTiltState] = useState({ x: 0, y: 0 });
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      if (!cardRef.current) return;
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => {
-        const rect = cardRef.current!.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-        const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-        tiltRef.current = { x: y * -12, y: x * 12 };
-        setTiltState(tiltRef.current);
-      });
-    },
-    []
-  );
+  useEffect(() => {
+    if (card.type !== "video") return;
 
-  const handleMouseLeave = useCallback(() => {
-    tiltRef.current = { x: 0, y: 0 };
-    setTiltState({ x: 0, y: 0 });
-    setIsHovered(false);
-  }, []);
+    const cardEl = cardRef.current;
+    const videoEl = videoRef.current;
+    if (!cardEl || !videoEl) return;
 
-  const handleMouseEnter = useCallback(() => {
-    setIsHovered(true);
-  }, []);
+    const pauseVideo = () => {
+      videoEl.pause();
+    };
 
-  // Simple scroll-based fade and slight upward shift
-  const staggerOffset = index * 0.15;
-  const cardProgress = Math.max(
-    0,
-    Math.min(1, (progress - staggerOffset) / (1 - staggerOffset))
-  );
-  const entryOpacity = Math.min(1, cardProgress * 2.5);
+    const playVideo = () => {
+      const playPromise = videoEl.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(pauseVideo);
+      }
+    };
 
-  // 3D Tilt for the card (mouse-driven)
-  const cardTransform = isVisible
-    ? `perspective(1200px) rotateX(${tiltState.x}deg) rotateY(${tiltState.y}deg)`
-    : `perspective(1200px) rotateX(0deg)`;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          playVideo();
+          return;
+        }
+
+        pauseVideo();
+      },
+      { threshold: 0.2, rootMargin: "120px 0px 120px 0px" }
+    );
+
+    observer.observe(cardEl);
+    pauseVideo();
+
+    return () => {
+      observer.disconnect();
+      pauseVideo();
+    };
+  }, [card.type]);
 
   return (
     <div
@@ -133,40 +102,12 @@ function ShowcaseCard({
         index % 2 === 0 ? "sc-card-container--left" : "sc-card-container--right"
       }`}
       style={{
-        opacity: isVisible ? entryOpacity : 0,
-        transform: isVisible ? `translateY(${(1 - cardProgress) * 40}px)` : `translateY(100px)`,
-        transition: "opacity 800ms ease, transform 800ms cubic-bezier(0.23, 1, 0.32, 1)",
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? "translateY(0)" : "translateY(48px)",
+        transition: "opacity 420ms ease, transform 420ms ease",
       }}
     >
-      {/* ── 3D Media Card ── */}
-      <div
-        ref={cardRef}
-        className={`sc-card sc-card--${card.glow}`}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        onMouseEnter={handleMouseEnter}
-        style={{ transform: cardTransform }}
-      >
-        {/* Reflective border highlight */}
-        <div
-          className="sc-card__border-light"
-          style={{
-            background: `radial-gradient(
-              circle at ${50 + tiltState.y * 4}% ${50 + tiltState.x * 4}%,
-              ${
-                card.glow === "red"
-                  ? "rgba(227,0,11,0.5)"
-                  : card.glow === "cyan"
-                  ? "rgba(0,212,255,0.5)"
-                  : "rgba(245,166,35,0.5)"
-              },
-              transparent 70%
-            )`,
-            opacity: isHovered ? 1 : 0,
-          }}
-        />
-
-        {/* Media */}
+      <div ref={cardRef} className={`sc-card sc-card--${card.glow}`}>
         <div
           className="sc-card__media-wrap"
           style={{
@@ -175,8 +116,8 @@ function ShowcaseCard({
         >
           {card.type === "video" ? (
             <video
+              ref={videoRef}
               src={card.src}
-              autoPlay
               muted
               loop
               playsInline
@@ -201,45 +142,12 @@ function ShowcaseCard({
               }}
             />
           )}
-
-          {/* Ken Burns zoom driven by scroll */}
-          <div
-            className="sc-card__media-zoom"
-            style={{
-              transform: `scale(${
-                1 + progress * 0.08 + (isHovered ? 0.05 : 0)
-              })`,
-            }}
-          />
         </div>
 
-        {/* Cinematic vignette */}
         <div className="sc-card__vignette" />
-
-        {/* Overlay content (REMOVED DESCRIPTION TEXT) */}
-        <div
-          className={`sc-card__overlay ${
-            isHovered ? "sc-card__overlay--active" : ""
-          }`}
-        >
-          {/* We leave the overlay empty or you could put a "View Project" button here */}
-        </div>
-
-        {/* Glow orb */}
-        <div
-          className={`sc-card__glow sc-card__glow--${card.glow}`}
-          style={{
-            transform: `translate(${tiltState.y * 3}px, ${tiltState.x * 3}px)`,
-            opacity: isHovered ? 0.8 : 0.2 + progress * 0.15,
-          }}
-        />
-
-        {/* Corner accent lines */}
-        <div className="sc-card__corner sc-card__corner--tl" />
-        <div className="sc-card__corner sc-card__corner--br" />
+        <div className="sc-card__overlay" />
       </div>
 
-      {/* ── Text Content (Beside the card) ── */}
       <div className="sc-card-text">
         <span className="sc-card__tag">
           {card.tagIcon === "play" ? (
@@ -282,127 +190,29 @@ function ShowcaseCard({
   );
 }
 
-/* ── Main showcase component ── */
 export function ShowcaseReel() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const progressRef = useRef(0);
-  const [renderProgress, setRenderProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
-  const particles = useParticles(8); // Reduced from 20 to 8
-  const lastUpdateRef = useRef(0);
 
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
 
-    let rafId: number;
-    let isIntersecting = false;
-
-    const onScroll = () => {
-      if (!isIntersecting) return;
-
-      const rect = el.getBoundingClientRect();
-      const windowH = window.innerHeight;
-      const raw = (windowH - rect.top) / (windowH + rect.height);
-      const clamped = Math.max(0, Math.min(1, raw));
-
-      progressRef.current = clamped;
-
-      // Throttle React re-renders to ~30fps instead of 60fps
-      const now = performance.now();
-      if (now - lastUpdateRef.current > 33) {
-        lastUpdateRef.current = now;
-        setRenderProgress(clamped);
-        setIsVisible(clamped > 0.05);
-      }
-
-      rafId = requestAnimationFrame(onScroll);
-    };
-
     const observer = new IntersectionObserver(
       ([entry]) => {
-        isIntersecting = entry.isIntersecting;
-        if (isIntersecting) {
-          rafId = requestAnimationFrame(onScroll);
-        } else {
-          cancelAnimationFrame(rafId);
-          // Stop tracking when not visible
-          setIsVisible(false);
-        }
+        setIsVisible(entry.isIntersecting);
       },
-      { threshold: 0, rootMargin: "100px 0px 100px 0px" }
+      { threshold: 0.08, rootMargin: "120px 0px 120px 0px" }
     );
 
     observer.observe(el);
 
-    return () => {
-      observer.disconnect();
-      cancelAnimationFrame(rafId);
-    };
+    return () => observer.disconnect();
   }, []);
 
-  // Spotlight position driven by scroll
-  const spotlightX = 20 + renderProgress * 60;
-  const spotlightY = 30 + renderProgress * 40;
-
   return (
-    <section
-      ref={sectionRef}
-      id="showcase"
-      className="sc-section"
-      style={{
-        // Dynamic cinematic spotlight
-        background: `
-          radial-gradient(
-            ellipse 600px 400px at ${spotlightX}% ${spotlightY}%,
-            rgba(227, 0, 11, 0.06),
-            transparent
-          ),
-          radial-gradient(
-            ellipse 400px 300px at ${100 - spotlightX}% ${100 - spotlightY}%,
-            rgba(0, 212, 255, 0.04),
-            transparent
-          ),
-          var(--bg-dark)
-        `,
-      }}
-    >
-      {/* Floating particles (reduced from 20 to 8) */}
-      <div className="sc-particles" aria-hidden="true">
-        {particles.map((p) => (
-          <div
-            key={p.id}
-            className="sc-particle"
-            style={{
-              left: `${p.x}%`,
-              top: `${p.y}%`,
-              width: `${p.size}px`,
-              height: `${p.size}px`,
-              opacity: p.opacity * (0.5 + renderProgress * 0.5),
-              animationDuration: `${p.duration}s`,
-              animationDelay: `${p.delay}s`,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Decorative grid lines */}
-      <div className="sc-grid-lines" aria-hidden="true">
-        <div className="sc-grid-line sc-grid-line--v" style={{ left: "25%" }} />
-        <div className="sc-grid-line sc-grid-line--v" style={{ left: "50%" }} />
-        <div className="sc-grid-line sc-grid-line--v" style={{ left: "75%" }} />
-        <div className="sc-grid-line sc-grid-line--h" style={{ top: "33%" }} />
-        <div className="sc-grid-line sc-grid-line--h" style={{ top: "66%" }} />
-      </div>
-
-      {/* Section header */}
-      <div
-        className="sc-header"
-        style={{
-          transform: `translateY(${(1 - Math.min(1, renderProgress * 3)) * 60}px)`,
-          opacity: Math.min(1, renderProgress * 4),
-        }}
-      >
+    <section ref={sectionRef} id="showcase" className="sc-section">
+      <div className="sc-header">
         <div className="sc-header__kicker">
           <span className="sc-header__line" />
           Showcase Reel
@@ -412,39 +222,20 @@ export function ShowcaseReel() {
           OUR LATEST <span className="gradient-text">CREATIONS</span>
         </h2>
         <p className="sc-header__subtitle">
-          From 3D characters to immersive environments — see what our Blender +
+          From 3D characters to immersive environments - see what our Blender +
           Unity pipeline brings to life.
         </p>
       </div>
 
-      {/* Cards container with perspective */}
-      <div
-        className="sc-cards"
-        style={{
-          perspective: "1600px",
-          perspectiveOrigin: `${50 + (renderProgress - 0.5) * 10}% ${50 + (renderProgress - 0.5) * 20}%`,
-        }}
-      >
+      <div className="sc-cards">
         {CARDS.map((card, i) => (
           <ShowcaseCard
-            key={i}
+            key={card.title}
             card={card}
             index={i}
-            progress={renderProgress}
             isVisible={isVisible}
           />
         ))}
-      </div>
-
-      {/* Scroll progress indicator */}
-      <div
-        className="sc-scroll-indicator"
-        style={{ opacity: renderProgress < 0.3 ? 1 : 0 }}
-      >
-        <div className="sc-scroll-indicator__mouse">
-          <div className="sc-scroll-indicator__wheel" />
-        </div>
-        <span>Scroll to explore</span>
       </div>
     </section>
   );

@@ -5,7 +5,6 @@ import { Footer } from "@/components/Footer";
 import Link from "next/link";
 import { Suspense } from "react";
 import { AnimatedStat } from "@/components/AnimatedStat";
-import { color } from "three/tsl";
 
 /* Lazy-load heavy components so they don't block initial render */
 const CustomSketchfabViewer = dynamic(
@@ -36,13 +35,18 @@ export default function Home() {
             style={{
               width: "100%",
               height: "100%",
-              opacity: 0.7,
-              background: "black",
+              opacity: 0.92,
+              background:
+                "radial-gradient(circle at 70% 45%, rgba(255, 48, 64, 0.26), transparent 36%), radial-gradient(circle at 54% 52%, rgba(255, 255, 255, 0.08), transparent 30%), #07080c",
               overflow: "hidden",
               position: "relative",
             }}
           >
-            <Suspense fallback={null}>
+            <Suspense
+              fallback={
+                <div className="hero-model-fallback">Loading 3D car</div>
+              }
+            >
               <CustomSketchfabViewer />
             </Suspense>
           </div>
@@ -139,7 +143,7 @@ export default function Home() {
       </section>
 
       {/* ─── PORTFOLIO ─── */}
-      <section
+      {/* <section
         id="work"
         className="content-section"
         style={{ background: "var(--bg-dark)" }}
@@ -189,7 +193,7 @@ export default function Home() {
             See Full Portfolio →
           </Link>
         </div>
-      </section>
+      </section> */}
 
       {/* ─── WHY CHOOSE US ─── */}
       <section
@@ -270,7 +274,7 @@ export default function Home() {
               quote:
                 "MGD's ability to create highly immersive AR/VR experiences is truly world-class. They delivered beyond our expectations.",
               name: "Dr. Ani Atanasova",
-              role: "CEO at Pixelhunters (Dubai)",
+              role: "Pixelhunters (Dubai)",
             },
             {
               quote:
@@ -282,7 +286,7 @@ export default function Home() {
               quote:
                 "Their deep understanding of Unity and Blender helped us bring complex simulation logic to life with incredible visual fidelity.",
               name: "Eng. Iliya Atanasov",
-              role: "Studio Director at Pixelhunters (Dubai)",
+              role: "Pixelhunters (Dubai)",
             },
           ].map((t, i) => (
             <div

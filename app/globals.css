@@ -154,17 +154,15 @@ textarea {
   left: clamp(1rem, 3vw, 2rem);
   z-index: 10;
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr;
   align-items: center;
   gap: 1rem;
   min-height: 4.2rem;
   padding: 0.7rem 1.25rem;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: var(--surface-glass);
-  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(10, 10, 15, 0.94);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.38);
   transition:
     background 180ms ease,
     border-color 180ms ease,
@@ -176,7 +174,7 @@ textarea {
 .site-header--solid {
   border-color: var(--line-accent);
   background: rgba(10, 10, 15, 0.96);
-  box-shadow: 0 18px 70px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.48);
 }
 
 .site-brand,
@@ -252,29 +250,6 @@ textarea {
 .site-nav a:hover::after,
 .site-nav a.active::after {
   transform: scaleX(1);
-}
-
-/* Header CTA */
-.header-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.6rem;
-  padding: 0 1.25rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: #fff;
-  background: var(--accent);
-  box-shadow: 0 0 0 rgba(227, 0, 11, 0);
-  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
-  white-space: nowrap;
-  letter-spacing: 0.02em;
-}
-
-.header-cta:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0 28px var(--accent-glow);
 }
 
 /* Mobile menu */
@@ -407,6 +382,19 @@ textarea {
   justify-content: center;
   pointer-events: none;
   background: var(--bg-darker);
+}
+
+.hero-model-fallback {
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(8, 9, 13, 0.72);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .hero-video {
@@ -1388,12 +1376,9 @@ textarea {
 /* Wrapper takes full viewport */
 .parallax-contact-wrapper {
   --contact-video-bg: #02030a;
-  position: fixed;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
-  height: 100vh;
-  z-index: 1;
+  min-height: 100vh;
   background: var(--contact-video-bg);
 }
 
@@ -1413,7 +1398,7 @@ textarea {
   --contact-video-bg: #02030a;
   position: relative;
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
   background: var(--contact-video-bg);
   overflow: hidden;
 }
@@ -2791,8 +2776,6 @@ textarea {
 
 .reveal-section {
   animation: fadeUp 740ms ease both;
-  animation-timeline: view();
-  animation-range: entry 0% cover 28%;
 }
 
 /* ═══════════════════════════════════════════
@@ -2824,7 +2807,7 @@ textarea {
 
 @media (max-width: 920px) {
   .site-header {
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 0.75rem;
   }
 
@@ -2945,13 +2928,6 @@ textarea {
 
   .site-brand small {
     font-size: 0.54rem;
-  }
-
-  .header-cta {
-    display: none;
-    min-height: 2.4rem;
-    padding: 0 0.75rem;
-    font-size: 0.75rem;
   }
 
   .site-nav {
@@ -3265,7 +3241,7 @@ textarea {
     top: 0.75rem;
     right: 1rem;
     left: 1rem;
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     width: auto;
     max-width: calc(100vw - 2rem);
   }
@@ -3419,6 +3395,43 @@ textarea {
     margin: 0 auto;
     aspect-ratio: 4 / 5;
     transform: none !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+    transition: opacity 240ms ease;
+  }
+
+  .sc-card:hover,
+  .sc-card--cyan:hover,
+  .sc-card--gold:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  }
+
+  .sc-card__border-light,
+  .sc-card__glow,
+  .sc-card__media-zoom {
+    display: none;
+  }
+
+  .sc-card__media {
+    transition: none;
+  }
+
+  .sc-card:hover .sc-card__media {
+    transform: none;
+    filter: none;
+  }
+
+  .sc-card__vignette {
+    background: linear-gradient(180deg, transparent 45%, rgba(0, 0, 0, 0.34) 100%);
+  }
+
+  .sc-card__overlay {
+    background: linear-gradient(180deg, transparent 35%, rgba(6, 6, 10, 0.76) 100%);
+    transition: opacity 180ms ease;
+  }
+
+  .sc-card__tag {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 
   .sc-card-text {
