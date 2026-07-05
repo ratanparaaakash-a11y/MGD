@@ -336,7 +336,7 @@ export default function ContactPage() {
                 </a>
                 {/* YouTube */}
                 <a
-                  href="https://youtube.com"
+                  href="https://www.youtube.com/@mgdgames_ai"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="social-btn"
@@ -369,7 +369,6 @@ export default function ContactPage() {
         <Link href="/services" className="button button-primary">
           EXPLORE OUR SERVICES →
         </Link>
-       
       </section>
 
       <Footer />

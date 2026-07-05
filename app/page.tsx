@@ -5,7 +5,6 @@ import { Footer } from "@/components/Footer";
 import Link from "next/link";
 import { Suspense } from "react";
 import { AnimatedStat } from "@/components/AnimatedStat";
-import { color } from "three/tsl";
 
 /* Lazy-load heavy components so they don't block initial render */
 const CustomSketchfabViewer = dynamic(
@@ -36,13 +35,18 @@ export default function Home() {
             style={{
               width: "100%",
               height: "100%",
-              opacity: 0.7,
-              background: "black",
+              opacity: 0.92,
+              background:
+                "radial-gradient(circle at 70% 45%, rgba(255, 48, 64, 0.26), transparent 36%), radial-gradient(circle at 54% 52%, rgba(255, 255, 255, 0.08), transparent 30%), #07080c",
               overflow: "hidden",
               position: "relative",
             }}
           >
-            <Suspense fallback={null}>
+            <Suspense
+              fallback={
+                <div className="hero-model-fallback">Loading 3D car</div>
+              }
+            >
               <CustomSketchfabViewer />
             </Suspense>
           </div>
@@ -55,7 +59,7 @@ export default function Home() {
             <span className="text-red" style={{ display: "block" }}>
               WORLDS
             </span>
-            <span>IN 3D.</span>
+            <span>IN 3D</span>
           </h1>
           <p style={{ maxWidth: "400px" }}>
             Blender + Unity powered studio crafting games, AR/VR apps,

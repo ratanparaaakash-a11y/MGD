@@ -1,15 +1,18 @@
 "use client";
-import React, { Suspense, useEffect, useState, useRef } from "react";
+
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Stage } from "@react-three/drei";
+import { Center, Html, OrbitControls, useGLTF } from "@react-three/drei";
 
 type SplashWindow = Window & {
   __muktaHeroModelReady?: boolean;
   __muktaSplashComplete?: boolean;
 };
 
-function Model(props: any) {
-  const { scene } = useGLTF("/nissan_fairlady_z_s30240z_1978.glb");
+const HERO_MODEL_PATH = "/nissan_fairlady_z_s30240z_1978.meshopt.glb";
+
+function Model() {
+  const { scene } = useGLTF(HERO_MODEL_PATH);
 
   useEffect(() => {
     const splashWindow = window as SplashWindow;
@@ -17,34 +20,38 @@ function Model(props: any) {
     window.dispatchEvent(new Event("mukta:hero-model-ready"));
   }, []);
 
-  return <primitive object={scene} {...props} />;
+  return (
+    <Center>
+      <primitive object={scene} rotation={[0, -0.25, 0]} scale={2} />
+    </Center>
+  );
 }
 
-/* Periodically invalidate frames for auto-rotate in "demand" mode */
+function ModelFallback() {
+  return (
+    <Html center>
+      <div className="hero-model-fallback">Loading 3D car</div>
+    </Html>
+  );
+}
+
 function FrameInvalidator() {
   const { invalidate } = useThree();
 
   useEffect(() => {
-    let id: number;
-    const loop = () => {
-      invalidate();
-      id = requestAnimationFrame(loop);
-    };
-    // Invalidate at ~30fps instead of 60fps for auto-rotate
-    const interval = setInterval(() => {
+    const interval = window.setInterval(() => {
       invalidate();
     }, 33);
 
-    return () => {
-      cancelAnimationFrame(id);
-      clearInterval(interval);
-    };
+    return () => window.clearInterval(interval);
   }, [invalidate]);
 
   return null;
 }
 
 export function CustomSketchfabViewer() {
+  const viewerRef = useRef<HTMLDivElement>(null);
+  const [isHeroVisible, setIsHeroVisible] = useState(true);
   const [splashComplete, setSplashComplete] = useState(() => {
     if (typeof window === "undefined") {
       return false;
@@ -58,22 +65,37 @@ export function CustomSketchfabViewer() {
 
     window.addEventListener("mukta:splash-complete", handleSplashComplete);
 
-    // Fallback: if event was missed or never fired, poll briefly then force-enable
-    const fallback = setTimeout(() => {
+    const fallback = window.setTimeout(() => {
       setSplashComplete(true);
-    }, 4000); // Absolute max wait — 4s after mount
+    }, 2000);
 
     return () => {
-      window.removeEventListener(
-        "mukta:splash-complete",
-        handleSplashComplete
-      );
-      clearTimeout(fallback);
+      window.removeEventListener("mukta:splash-complete", handleSplashComplete);
+      window.clearTimeout(fallback);
     };
   }, []);
 
+  useEffect(() => {
+    const el = viewerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsHeroVisible(entry.isIntersecting);
+      },
+      { threshold: 0.05, rootMargin: "80px 0px 80px 0px" }
+    );
+
+    observer.observe(el);
+
+    return () => observer.disconnect();
+  }, []);
+
+  const shouldAnimateHero = splashComplete && isHeroVisible;
+
   return (
     <div
+      ref={viewerRef}
       style={{
         width: "100%",
         height: "100%",
@@ -83,29 +105,32 @@ export function CustomSketchfabViewer() {
       }}
     >
       <Canvas
-        shadows={splashComplete}
-        dpr={splashComplete ? [1, 1.5] : [0.5, 1]}
+        dpr={[0.6, 1]}
         frameloop="demand"
-        camera={{ position: [0, 0, 10], fov: 45 }}
+        camera={{ position: [0, 1.1, 8], fov: 42 }}
+        gl={{ antialias: false, alpha: true, powerPreference: "high-performance" }}
       >
-        <Suspense fallback={null}>
-          <Stage environment="city" intensity={0.5} adjustCamera>
-            <Model />
-          </Stage>
+        <ambientLight intensity={2.8} />
+        <hemisphereLight args={["#ffffff", "#510008", 1.35]} />
+        <directionalLight position={[4, 5, 6]} intensity={4.2} />
+        <directionalLight position={[-3, 2, -4]} intensity={1.8} color="#ff3148" />
+        <pointLight position={[0, 1.5, 3]} intensity={2.2} color="#ffffff" distance={7} />
+        <Suspense fallback={<ModelFallback />}>
+          <Model />
         </Suspense>
         <OrbitControls
           makeDefault
-          autoRotate={splashComplete}
+          autoRotate={shouldAnimateHero}
           autoRotateSpeed={1.5}
           enableZoom={false}
           enablePan={false}
           minPolarAngle={0}
           maxPolarAngle={Math.PI / 2 + 0.1}
         />
-        {splashComplete && <FrameInvalidator />}
+        {shouldAnimateHero && <FrameInvalidator />}
       </Canvas>
     </div>
   );
 }
 
-useGLTF.preload("/nissan_fairlady_z_s30240z_1978.glb");
+useGLTF.preload(HERO_MODEL_PATH);
