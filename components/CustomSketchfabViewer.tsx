@@ -13,6 +13,15 @@ const HERO_MODEL_PATH = "/nissan_fairlady_z_s30240z_1978.meshopt.glb";
 
 function Model() {
   const { scene } = useGLTF(HERO_MODEL_PATH);
+  const [scale, setScale] = useState(2);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    const update = () => setScale(mq.matches ? 1.8 : 2);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   useEffect(() => {
     const splashWindow = window as SplashWindow;
@@ -22,7 +31,7 @@ function Model() {
 
   return (
     <Center>
-      <primitive object={scene} rotation={[0, -0.25, 0]} scale={2} />
+      <primitive object={scene} rotation={[0, -0.25, 0]} scale={scale} />
     </Center>
   );
 }
