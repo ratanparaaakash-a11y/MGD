@@ -59,7 +59,7 @@ export default function Home() {
             <span className="text-red" style={{ display: "block" }}>
               WORLDS
             </span>
-            <span>IN 3D.</span>
+            <span>IN 3D</span>
           </h1>
           <p style={{ maxWidth: "400px" }}>
             Blender + Unity powered studio crafting games, AR/VR apps,

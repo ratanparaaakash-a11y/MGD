@@ -22,7 +22,7 @@ function Model() {
 
   return (
     <Center>
-      <primitive object={scene} rotation={[0, -0.25, 0]} scale={1.8} />
+      <primitive object={scene} rotation={[0, -0.25, 0]} scale={2} />
     </Center>
   );
 }
