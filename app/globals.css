@@ -3302,7 +3302,9 @@ textarea {
   }
 
   .hero-section {
-    min-height: 100svh;
+    /* Fit the content instead of forcing a full viewport, so the empty
+       scene area around the car is cropped rather than shown as dead space. */
+    min-height: auto;
   }
 
   .scene-canvas {
@@ -3310,10 +3312,18 @@ textarea {
   }
 
   .hero-copy {
+    /* Put the copy in normal flow so it defines the hero height. */
+    position: relative;
+    inset: auto;
     top: auto;
-    bottom: clamp(3rem, 10svh, 6rem);
+    right: auto;
+    bottom: auto;
+    left: auto;
+    transform: none;
     width: min(32rem, calc(100vw - 2rem));
     max-width: calc(100vw - 2rem);
+    margin: 0;
+    padding: 8.5rem 1rem 3.5rem;
   }
 
   .section-title,
@@ -3527,9 +3537,9 @@ textarea {
 
   .hero-copy {
     top: auto;
-    left: 1rem;
-    bottom: clamp(2.5rem, 9svh, 5rem);
-    padding: 0;
+    left: auto;
+    bottom: auto;
+    padding: 7.5rem 1rem 3rem;
   }
 
   .hero-kicker,
