@@ -380,8 +380,21 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none;
+  pointer-events: auto;
   background: var(--bg-darker);
+}
+
+/* On touch devices, let swipes pass through to the page so it scrolls
+   instead of the 3D model swallowing the gesture. We must disable pointer
+   events on the whole subtree (with !important) because @react-three/fiber
+   sets an inline `pointer-events: auto` on its canvas container, which would
+   otherwise keep the canvas a touch target and trap the scroll gesture.
+   The model keeps auto-rotating; only manual drag-to-rotate is disabled. */
+@media (hover: none) and (pointer: coarse) {
+  .scene-canvas,
+  .scene-canvas * {
+    pointer-events: none !important;
+  }
 }
 
 .hero-model-fallback {
@@ -3297,8 +3310,8 @@ textarea {
   }
 
   .hero-copy {
-    top: clamp(7rem, 14svh, 8.5rem);
-    bottom: auto;
+    top: auto;
+    bottom: clamp(3rem, 10svh, 6rem);
     width: min(32rem, calc(100vw - 2rem));
     max-width: calc(100vw - 2rem);
   }
@@ -3513,9 +3526,9 @@ textarea {
   }
 
   .hero-copy {
-    top: clamp(7.5rem, 18svh, 9rem);
+    top: auto;
     left: 1rem;
-    bottom: auto;
+    bottom: clamp(2.5rem, 9svh, 5rem);
     padding: 0;
   }
 

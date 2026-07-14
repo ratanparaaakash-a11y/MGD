@@ -29,7 +29,7 @@ export default function Home() {
     <div className="home-page">
       {/* ─── HERO ─── */}
       <section className="hero-section">
-        <div className="scene-canvas" style={{ width: "100%", height: "100%", pointerEvents: "auto" }}>
+        <div className="scene-canvas" style={{ width: "100%", height: "100%" }}>
           <div
             className="sketchfab-embed-wrapper"
             style={{
